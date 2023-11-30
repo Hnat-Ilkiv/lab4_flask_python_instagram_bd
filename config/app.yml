@@ -1,0 +1,7 @@
+# app/config/app.yml
+database:
+  host: localhost
+  user: USERNAME
+  password: PASSWORD
+  db: instagram_database
+
