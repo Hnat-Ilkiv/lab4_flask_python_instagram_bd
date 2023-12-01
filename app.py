@@ -3,25 +3,35 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import yaml
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Database
 
-# Завантаження конфігурації з файлу
-with open('config/app.yml', 'r') as config_file:
-    config = yaml.safe_load(config_file)
+db = SQLAlchemy()
+print(db.__dict__, 1)
+# app = Flask(__name__)
+def create_app() -> Flask:
+    with open('config/app.yml', 'r') as config_file:
+        config = yaml.safe_load(config_file)
 
-# Параметри підключення до бази даних
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+mysqlconnector://{config['database']['user']}:{config['database']['password']}@{config['database']['host']}/{config['database']['db']}?charset=utf8"
+    # Параметри підключення до бази даних
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{config['database']['user']}:{config['database']['password']}@{config['database']['host']}/{config['database']['db']}?charset=utf8"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+    _init_db(app)
+    from my_project.auth.route.user_route import user_bp
+    app.register_blueprint(user_bp)
 
-# Додайте маршрути для користувачів
-from my_project.auth.route.user_route import user_bp
-app.register_blueprint(user_bp, url_prefix='/user')
+    return app
 
-# Опрацювання помилки "Working outside of application context"
-with app.app_context():
-    db.create_all()
+
+def _init_db(app: Flask) -> None:
+    db.init_app(app)
+    # print("db work dto")
+    from my_project.auth.models.user_model import User
+
+    with app.app_context():
+        db.create_all()
+        print(db.__dict__, 2)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    create_app().run(debug=True)

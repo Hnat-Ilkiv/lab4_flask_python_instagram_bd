@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `instagram_database`.`user` (
     `email` VARCHAR(255) UNIQUE NOT NULL,
     `password_hash` VARCHAR(255) NOT NULL,
     `date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)ENGINE = INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+)ENGINE = INNODB;
 
 CREATE TABLE IF NOT EXISTS `instagram_database`.`user_details` (
     `id` INT PRIMARY KEY,

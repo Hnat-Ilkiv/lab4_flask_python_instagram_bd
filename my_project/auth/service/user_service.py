@@ -3,8 +3,8 @@ from my_project.auth.dao.user_dao import UserDao
 
 class UserService:
     @staticmethod
-    def create_user(username, email, password_hash):
-        return UserDao.create_user(username, email, password_hash)
+    def create_user(json):
+        return UserDao.create_user(json)
 
     @staticmethod
     def get_user_by_id(user_id):
