@@ -21,6 +21,9 @@ def create_app() -> Flask:
     from my_project.auth.route.user_route import user_bp
     app.register_blueprint(user_bp)
 
+    from my_project.auth.route.user_details_route import user_details_bp
+    app.register_blueprint(user_details_bp)
+
     return app
 
 
@@ -28,6 +31,7 @@ def _init_db(app: Flask) -> None:
     db.init_app(app)
     # print("db work dto")
     from my_project.auth.models.user_model import User
+    from my_project.auth.models.user_details_model import UserDetails
 
     with app.app_context():
         db.create_all()

@@ -1,4 +1,5 @@
 # app/my_project/auth/models/user.py
+from my_project.auth.models.user_details_model import UserDetails
 from app import db
 
 class User(db.Model):
@@ -9,6 +10,8 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
+
+    user_details = db.relationship('UserDetails', backref='user', uselist=False, cascade='all, delete-orphan', single_parent=True)
 
     @staticmethod
     def transform_from_json(json):
