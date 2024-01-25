@@ -1,4 +1,6 @@
 # app/my_project/auth/models/post.py
+from my_project.auth.models.comment_model import Comment
+from my_project.auth.models.reaction_model import Reaction
 from app import db
 
 class Post(db.Model):
@@ -11,6 +13,7 @@ class Post(db.Model):
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
     comment = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    reaction = db.relationship('Reaction', backref='post', lazy='dynamic', cascade='all, delete-orphan')
 
 
     @staticmethod

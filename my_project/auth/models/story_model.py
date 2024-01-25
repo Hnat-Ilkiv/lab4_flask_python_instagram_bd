@@ -1,4 +1,6 @@
 # app/my_project/auth/models/story.py
+from my_project.auth.models.comment_model import Comment
+from my_project.auth.models.reaction_model import Reaction
 from app import db
 
 class Story(db.Model):
@@ -10,6 +12,7 @@ class Story(db.Model):
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
     comment = db.relationship('Comment', backref='story', lazy='dynamic', cascade='all, delete-orphan')
+    reaction = db.relationship('Reaction', backref='story', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):

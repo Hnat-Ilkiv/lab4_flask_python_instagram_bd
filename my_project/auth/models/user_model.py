@@ -2,6 +2,8 @@
 from my_project.auth.models.user_details_model import UserDetails
 from my_project.auth.models.post_model import Post
 from my_project.auth.models.story_model import Story
+from my_project.auth.models.comment_model import Comment
+from my_project.auth.models.reaction_model import Reaction
 from app import db
 
 class User(db.Model):
@@ -17,6 +19,7 @@ class User(db.Model):
     posts = db.relationship('Post', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     storys = db.relationship('Story', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     comment = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    reaction = db.relationship('Reaction', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):

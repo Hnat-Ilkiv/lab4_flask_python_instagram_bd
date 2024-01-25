@@ -33,6 +33,9 @@ def create_app() -> Flask:
     from my_project.auth.route.comment_route import comment_bp
     app.register_blueprint(comment_bp)
 
+    from my_project.auth.route.reaction_route import reaction_bp
+    app.register_blueprint(reaction_bp)
+
     return app
 
 

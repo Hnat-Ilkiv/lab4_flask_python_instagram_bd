@@ -1,4 +1,5 @@
 # app/my_project/auth/models/comment.py
+from my_project.auth.models.reaction_model import Reaction
 from app import db
 
 class Comment(db.Model):
@@ -11,6 +12,7 @@ class Comment(db.Model):
     text = db.Column(db.Text)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
+    reaction = db.relationship('Reaction', backref='comment', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):
