@@ -1,4 +1,4 @@
-# app/my_project/auth/models/model.py
+# app/my_project/auth/models/user_details.py
 from app import db
 
 class UserDetails(db.Model):
@@ -16,4 +16,4 @@ class UserDetails(db.Model):
         return UserDetails(id = json.get("id"), full_name = json.get("full_name"), bio = json.get("bio"), profile_picture = json.get("profile_picture"))
 
     def transform_to_json(self):
-        return {'id': self.id, 'full_name': self.full_name, 'bio': self.bio, 'profile_picture': self.profile_picture}
+        return {'id': self.id, 'full_name': self.full_name, 'bio': self.bio, 'profile_picture': self.profile_picture, 'date': self.user.date, 'username': self.user.username, 'email': self.user.email, 'password_hash': self.user.password_hash}

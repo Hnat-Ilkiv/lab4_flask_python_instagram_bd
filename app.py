@@ -24,6 +24,9 @@ def create_app() -> Flask:
     from my_project.auth.route.user_details_route import user_details_bp
     app.register_blueprint(user_details_bp)
 
+    from my_project.auth.route.post_route import post_bp
+    app.register_blueprint(post_bp)
+
     return app
 
 
