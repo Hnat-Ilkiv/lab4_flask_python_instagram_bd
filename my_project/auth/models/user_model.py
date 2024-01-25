@@ -16,6 +16,7 @@ class User(db.Model):
     user_details = db.relationship('UserDetails', backref='user', uselist=False, cascade='all, delete-orphan', single_parent=True)
     posts = db.relationship('Post', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     storys = db.relationship('Story', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    comment = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):

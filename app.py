@@ -30,6 +30,9 @@ def create_app() -> Flask:
     from my_project.auth.route.story_route import story_bp
     app.register_blueprint(story_bp)
 
+    from my_project.auth.route.comment_route import comment_bp
+    app.register_blueprint(comment_bp)
+
     return app
 
 

@@ -10,6 +10,8 @@ class Post(db.Model):
     image_url = db.Column(db.String(255), nullable=False)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
+    comment = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+
 
     @staticmethod
     def transform_from_json(json):

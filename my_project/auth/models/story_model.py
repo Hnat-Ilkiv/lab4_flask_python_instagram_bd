@@ -9,6 +9,7 @@ class Story(db.Model):
     story_url = db.Column(db.String(255), nullable=False)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
+    comment = db.relationship('Comment', backref='story', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):
