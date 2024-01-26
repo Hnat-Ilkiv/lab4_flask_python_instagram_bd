@@ -4,6 +4,7 @@ CREATE DATABASE IF NOT EXISTS `instagram_database` DEFAULT CHARACTER SET utf8;
 
 USE `instagram_database`;
 
+DROP TABLE IF EXISTS `instagram_database`.`user_activity`;
 DROP TABLE IF EXISTS `instagram_database`.`chat_message`;
 DROP TABLE IF EXISTS `instagram_database`.`chat_member`;
 DROP TABLE IF EXISTS `instagram_database`.`reaction`;
@@ -134,9 +135,9 @@ CREATE TABLE `instagram_database`.`chat` (
 )ENGINE = INNODB;
 
 CREATE TABLE `instagram_database`.`chat_member` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
     `chat_id` INT NOT NULL,
     `user_id` INT NOT NULL,
+    PRIMARY KEY (chat_id, user_id),
     FOREIGN KEY (`chat_id`) REFERENCES `instagram_database`.`chat`(`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -156,6 +157,198 @@ CREATE TABLE `instagram_database`.`chat_message` (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 )ENGINE = INNODB;
+
+CREATE TABLE `instagram_database`.`user_activity` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `date_start` TIMESTAMP NOT NULL,
+    `date_finish` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `instagram_database`.`user`(`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+)ENGINE = INNODB;
+
+
+DELIMITER //
+CREATE TRIGGER before_insert_user_activity
+BEFORE INSERT ON user_activity
+FOR EACH ROW
+BEGIN
+    IF NEW.user_id NOT IN (SELECT id FROM user) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User does not exist';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE InsertUser(
+    IN p_username VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password_hash VARCHAR(255)
+)
+BEGIN
+    -- Параметризована вставка нових значень у таблицю користувачів
+    INSERT INTO instagram_database.user (username, email, password_hash)
+    VALUES (p_username, p_email, p_password_hash);
+END //
+DELIMITER ;
+
+CALL InsertUser('john_doe', 'john@example.com', 'hashed_password');
+
+DELIMITER //
+
+CREATE PROCEDURE insert_10_posts()
+BEGIN
+    DECLARE counter INT DEFAULT 1;
+
+    WHILE counter <= 10 DO
+        INSERT INTO `instagram_database`.`post` (user_id, caption, image_url)
+        VALUES (1, CONCAT('Caption ', counter), CONCAT('image_url_', counter));
+
+        SET counter = counter + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
+CALL insert_10_posts();
+
+-- DELIMITER $$
+-- CREATE FUNCTION calculate_avg_time_diff(table_name VARCHAR(255)) RETURNS DECIMAL(10,2)
+-- BEGIN
+--     DECLARE avg_diff DECIMAL(10,2);
+--     SET @query = CONCAT('SELECT AVG(TIMESTAMPDIFF(SECOND, date_start, date_finish)) 
+--                         INTO @avg_diff
+--                         FROM ', table_name);
+--     PREPARE stmt FROM @query;
+--     EXECUTE stmt;
+--     DEALLOCATE PREPARE stmt;
+--     RETURN @avg_diff;
+-- END $$
+-- DELIMITER ;
+-- SELECT calculate_avg_time_diff('user_activity');
+DELIMITER //
+CREATE PROCEDURE calculate_avg_time_diff(IN table_name VARCHAR(255), OUT avg_diff DECIMAL(10,2))
+BEGIN
+    SET @query = CONCAT('SELECT COALESCE(AVG(TIMESTAMPDIFF(SECOND, date_start, date_finish)), 0) 
+                        INTO @avg_diff
+                        FROM ', table_name);
+    
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+
+    SET avg_diff = COALESCE(@avg_diff, 0);
+END //
+DELIMITER ;
+
+-- CALL calculate_avg_time_diff('user_activity', @result);
+-- SELECT @result;
+
+DELIMITER //
+CREATE PROCEDURE wrapper_procedure()
+BEGIN
+    DECLARE avg_result DECIMAL(10,2);
+
+    -- Виклик процедури calculate_avg_time_diff
+    CALL calculate_avg_time_diff('user_activity', avg_result);
+
+    -- Вивід результату
+    SELECT avg_result AS avg_time_diff;
+END //
+DELIMITER ;
+
+-- CALL wrapper_procedure();
+
+DELIMITER //
+
+DELIMITER //
+
+CREATE PROCEDURE create_and_copy_tables()
+BEGIN
+    DECLARE table1_name VARCHAR(255);
+    DECLARE table2_name VARCHAR(255);
+
+    -- Генерація унікальних назв таблиць із штампами часу
+    SET table1_name = CONCAT('table_', UNIX_TIMESTAMP(), '_1');
+    SET table2_name = CONCAT('table_', UNIX_TIMESTAMP(), '_2');
+
+    -- Створення першої таблиці
+    SET @create_table1_query = CONCAT(
+        'CREATE TABLE IF NOT EXISTS ', table1_name, ' AS SELECT * FROM story;'
+    );
+    PREPARE stmt1 FROM @create_table1_query;
+    EXECUTE stmt1;
+    DEALLOCATE PREPARE stmt1;
+
+    -- Створення другої таблиці
+    SET @create_table2_query = CONCAT(
+        'CREATE TABLE IF NOT EXISTS ', table2_name, ' AS SELECT * FROM story;'
+    );
+    PREPARE stmt2 FROM @create_table2_query;
+    EXECUTE stmt2;
+    DEALLOCATE PREPARE stmt2;
+
+    -- Копіювання стрічок із батьківської таблиці в одну з додаткових таблиць
+    SET @copy_data_query = CONCAT(
+        'INSERT INTO ', IF(RAND() > 0.5, table1_name, table2_name), ' SELECT * FROM story;'
+    );
+    PREPARE stmt3 FROM @copy_data_query;
+    EXECUTE stmt3;
+    DEALLOCATE PREPARE stmt3;
+END //
+
+DELIMITER ;
+
+-- CALL create_and_copy_tables();
+
+
+
+DELIMITER //
+CREATE TRIGGER check_email_suffix
+BEFORE INSERT ON user
+FOR EACH ROW
+BEGIN
+    IF NEW.email NOT LIKE '%@example.com' AND NEW.email NOT LIKE '%@gmail.com' AND NEW.email NOT LIKE '%@lpnu.ua' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email suffix';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER check_full_name_format
+BEFORE INSERT ON user_details
+FOR EACH ROW
+BEGIN
+    -- Перевірка формату full_name
+    IF NOT (NEW.full_name REGEXP '^[A-Z][a-z]+ [A-Z][a-z]+$') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid full name format. It should contain two words starting with an uppercase letter each.';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER prevent_short_text
+BEFORE INSERT ON instagram_database.comment
+FOR EACH ROW
+BEGIN
+    IF LENGTH(NEW.text) < 11 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Text length must be at least 11 characters';
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+
+
 
 INSERT INTO `instagram_database`.`user` (`username`, `email`, `password_hash`, `date`)
 VALUES
@@ -551,6 +744,14 @@ VALUES
     (7, 13),
     (7, 14),
     (8, 15);
+
+INSERT INTO `instagram_database`.`user_activity` (`user_id`, `date_start`, `date_finish`)
+VALUES
+    (1, '2024-01-27 12:00:00', '2024-01-27 13:00:00'),
+    (2, '2024-01-27 14:30:00', '2024-01-27 16:00:00'),
+    (3, '2024-01-27 18:45:00', '2024-01-27 19:30:00'),
+    (4, '2024-01-27 20:15:00', '2024-01-27 21:00:00'),
+    (5, '2024-01-27 22:30:00', '2024-01-27 23:45:00');
 
 
 CREATE UNIQUE INDEX `idx_username` ON `instagram_database`.`user`(`username`);

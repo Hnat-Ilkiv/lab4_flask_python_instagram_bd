@@ -22,10 +22,10 @@ def get_user_in_chat(chat_id):
     else:
         return jsonify({'chat_member': 'ChatMembers not found'}), 404
 
-@chat_member_bp.route('/chat_member/<int:chat_member_id>', methods=['GET'])
-def get_chat_member_by_id(chat_member_id):
+@chat_member_bp.route('/chat_member/<int:chat_id>/<int:user_id>', methods=['GET'])
+def get_chat_member_by_id(chat_id, user_id):
     from my_project.auth.service.chat_member_service import ChatMemberService
-    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_member_id)
+    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_id, user_id)
     if user_chat_member:
         return jsonify(user_chat_member.transform_to_json())
     else:
@@ -41,23 +41,23 @@ def create_chat_member():
     new_chat_member = ChatMemberService.create_chat_member(data)
     return jsonify(new_chat_member), 201
 
-@chat_member_bp.route('/chat_member/<int:chat_member_id>', methods=['PUT'])
-def update_chat_member(chat_member_id):
+@chat_member_bp.route('/chat_member/<int:chat_id>/<int:user_id>', methods=['PUT'])
+def update_chat_member(chat_id, user_id):
     from my_project.auth.service.chat_member_service import ChatMemberService
-    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_member_id)
+    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_id, user_id)
     if not user_chat_member:
         return jsonify({'chat_member': 'ChatMember not found'}), 404
 
     data = request.json
-    ChatMemberService.update_chat_member(chat_member_id, data)
+    ChatMemberService.update_chat_member(chat_id, user_id, data)
     return jsonify({'chat_member': 'ChatMember updated successfully'}), 200
 
-@chat_member_bp.route('/chat_member/<int:chat_member_id>', methods=['DELETE'])
-def delete_chat_member(chat_member_id):
+@chat_member_bp.route('/chat_member/<int:chat_id>/<int:user_id>', methods=['DELETE'])
+def delete_chat_member(chat_id, user_id):
     from my_project.auth.service.chat_member_service import ChatMemberService
-    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_member_id)
+    user_chat_member = ChatMemberService.get_chat_member_by_id(chat_id, user_id)
     if not user_chat_member:
         return jsonify({'chat_member': 'ChatMember not found'}), 404
 
-    ChatMemberService.delete_chat_member(chat_member_id)
+    ChatMemberService.delete_chat_member(chat_id, user_id)
     return jsonify({'chat_member': 'ChatMember deleted successfully'}), 200

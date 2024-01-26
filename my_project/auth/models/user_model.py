@@ -8,6 +8,7 @@ from my_project.auth.models.follower_model import Follower
 from my_project.auth.models.message_model import Message
 from my_project.auth.models.chat_model import Chat
 from my_project.auth.models.chat_member_model import ChatMember
+from my_project.auth.models.user_activity_model import UserActivity
 from app import db
 
 class User(db.Model):
@@ -30,6 +31,7 @@ class User(db.Model):
     receiver = db.relationship('Message', backref='user_receiver', lazy='dynamic', cascade='all, delete-orphan', foreign_keys='Message.receiver_id')
     chat = db.relationship('Chat', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     chat_member = db.relationship('ChatMember', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    user_activity = db.relationship('UserActivity', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):
