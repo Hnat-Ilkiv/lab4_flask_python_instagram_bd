@@ -39,6 +39,9 @@ def create_app() -> Flask:
     from my_project.auth.route.follower_route import follower_bp
     app.register_blueprint(follower_bp)
 
+    from my_project.auth.route.message_route import message_bp
+    app.register_blueprint(message_bp)
+
     return app
 
 
