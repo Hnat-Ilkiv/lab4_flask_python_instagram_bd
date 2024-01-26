@@ -1,4 +1,5 @@
 # app/my_project/auth/models/chat.py
+from my_project.auth.models.chat_member_model import ChatMember
 from app import db
 
 class Chat(db.Model):
@@ -8,6 +9,9 @@ class Chat(db.Model):
     chat_name = db.Column(db.String(255), nullable=False)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
+
+    chat_member = db.relationship('ChatMember', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
+
 
     @staticmethod
     def transform_from_json(json):
