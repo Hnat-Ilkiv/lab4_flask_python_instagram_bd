@@ -20,13 +20,13 @@ class ChatMemberDao:
         return ChatMember.query.filter_by(chat_id=chat_id).all()
 
     @staticmethod
-    def get_chat_member_by_id(chat_member_id):
-        return ChatMember.query.get(chat_member_id)
+    def get_chat_member_by_id(chat_id, user_id):
+        return ChatMember.query.get((chat_id, user_id))
 
     @staticmethod
-    def update_chat_member(chat_member_id, new_data):
-        print(chat_member_id)
-        user_chat_member = ChatMember.get_chat_member_by_id(chat_member_id)
+    def update_chat_member(chat_id, user_id, new_data):
+        print(chat_id, user_id)
+        user_chat_member = ChatMember.get_chat_member_by_id(chat_id, user_id)
         print("-"*1000)
         print(user_chat_member)
         for key, value in new_data.items():
@@ -34,7 +34,7 @@ class ChatMemberDao:
         db.session.commit()
 
     @staticmethod
-    def delete_chat_member(chat_member_id):
-        user_chat_member = ChatMember.get_chat_member_by_id(chat_member_id)
+    def delete_chat_member(chat_id, user_id):
+        user_chat_member = ChatMember.get_chat_member_by_id(chat_id, user_id)
         db.session.delete(user_chat_member)
         db.session.commit()

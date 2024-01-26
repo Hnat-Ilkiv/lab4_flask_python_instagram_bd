@@ -15,13 +15,13 @@ class ChatMemberService:
         return ChatMemberDao.get_user_in_chat(chat_id)
 
     @staticmethod
-    def get_chat_member_by_id(chat_member_id):
-        return ChatMemberDao.get_chat_member_by_id(chat_member_id)
+    def get_chat_member_by_id(chat_id, user_id):
+        return ChatMemberDao.get_chat_member_by_id(chat_id, user_id)
 
     @staticmethod
-    def update_chat_member(chat_member_id, new_data):
-        ChatMemberDao.update_chat_member(chat_member_id, new_data)
+    def update_chat_member(chat_id, user_id, new_data):
+        ChatMemberDao.update_chat_member(chat_id, user_id, new_data)
 
     @staticmethod
-    def delete_chat_member(chat_member_id):
-        ChatMemberDao.delete_chat_member(chat_member_id)
+    def delete_chat_member(chat_id, user_id):
+        ChatMemberDao.delete_chat_member(chat_id, user_id)
