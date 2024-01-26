@@ -1,4 +1,5 @@
 # app/my_project/auth/models/message_model.py
+from my_project.auth.models.chat_message_model import ChatMessage
 from app import db
 
 class Message(db.Model):
@@ -10,6 +11,8 @@ class Message(db.Model):
     text = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
+
+    chat_message = db.relationship('ChatMessage', backref='message', lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def transform_from_json(json):

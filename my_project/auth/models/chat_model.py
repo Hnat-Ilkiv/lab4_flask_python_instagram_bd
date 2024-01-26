@@ -1,5 +1,6 @@
 # app/my_project/auth/models/chat.py
 from my_project.auth.models.chat_member_model import ChatMember
+from my_project.auth.models.chat_message_model import ChatMessage
 from app import db
 
 class Chat(db.Model):
@@ -11,6 +12,7 @@ class Chat(db.Model):
     date = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), nullable=False)
 
     chat_member = db.relationship('ChatMember', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
+    chat_message = db.relationship('ChatMessage', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
 
 
     @staticmethod

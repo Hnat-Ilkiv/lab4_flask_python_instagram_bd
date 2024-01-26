@@ -10,7 +10,7 @@ class ChatMember(db.Model):
 
     @staticmethod
     def transform_from_json(json):
-        return Message(id = json.get("id"), chat_id = json.get("chat_id"), user_id = json.get("user_id"))
+        return ChatMember(id = json.get("id"), chat_id = json.get("chat_id"), user_id = json.get("user_id"))
 
     def transform_to_json(self):
         return {'id': self.id, 'chat_id': self.chat_id, 'user_id': self.user_id, 'user_name': self.user.username, 'chat_name': self.chat.chat_name}
