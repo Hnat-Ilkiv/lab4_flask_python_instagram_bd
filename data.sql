@@ -302,8 +302,53 @@ END //
 
 DELIMITER ;
 
-
 -- CALL create_and_copy_tables();
+
+
+
+DELIMITER //
+CREATE TRIGGER check_email_suffix
+BEFORE INSERT ON user
+FOR EACH ROW
+BEGIN
+    IF NEW.email NOT LIKE '%@example.com' AND NEW.email NOT LIKE '%@gmail.com' AND NEW.email NOT LIKE '%@lpnu.ua' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid email suffix';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER check_full_name_format
+BEFORE INSERT ON user_details
+FOR EACH ROW
+BEGIN
+    -- Перевірка формату full_name
+    IF NOT (NEW.full_name REGEXP '^[A-Z][a-z]+ [A-Z][a-z]+$') THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid full name format. It should contain two words starting with an uppercase letter each.';
+    END IF;
+END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER prevent_short_text
+BEFORE INSERT ON instagram_database.comment
+FOR EACH ROW
+BEGIN
+    IF LENGTH(NEW.text) < 11 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Text length must be at least 11 characters';
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+
+
 
 INSERT INTO `instagram_database`.`user` (`username`, `email`, `password_hash`, `date`)
 VALUES
