@@ -4,6 +4,7 @@ CREATE DATABASE IF NOT EXISTS `instagram_database` DEFAULT CHARACTER SET utf8;
 
 USE `instagram_database`;
 
+DROP TABLE IF EXISTS `instagram_database`.`user_activity`;
 DROP TABLE IF EXISTS `instagram_database`.`chat_message`;
 DROP TABLE IF EXISTS `instagram_database`.`chat_member`;
 DROP TABLE IF EXISTS `instagram_database`.`reaction`;
@@ -156,6 +157,31 @@ CREATE TABLE `instagram_database`.`chat_message` (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 )ENGINE = INNODB;
+
+CREATE TABLE `instagram_database`.`user_activity` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `date_start` TIMESTAMP NOT NULL,
+    `date_finish` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `instagram_database`.`user`(`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+)ENGINE = INNODB;
+
+
+DELIMITER //
+CREATE TRIGGER before_insert_user_activity
+BEFORE INSERT ON user_activity
+FOR EACH ROW
+BEGIN
+    IF NEW.user_id NOT IN (SELECT id FROM user) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User does not exist';
+    END IF;
+END;
+//
+DELIMITER ;
+
 
 INSERT INTO `instagram_database`.`user` (`username`, `email`, `password_hash`, `date`)
 VALUES

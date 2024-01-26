@@ -51,6 +51,9 @@ def create_app() -> Flask:
     from my_project.auth.route.chat_message_route import chat_message_bp
     app.register_blueprint(chat_message_bp)
 
+    from my_project.auth.route.user_activity_route import user_activity_bp
+    app.register_blueprint(user_activity_bp)
+
     return app
 
 
